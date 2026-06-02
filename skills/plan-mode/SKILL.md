@@ -1,6 +1,7 @@
 ---
 name: plan-mode
 description: Break down complex tasks into detailed, step-by-step plans before implementation. Analyze requirements, identify dependencies, propose solutions, and structure work for clarity and efficiency. Use this when tackling large features, refactoring, debugging, or multi-part changes.
+disable-model-invocation: true
 ---
 
 # Plan Mode
