@@ -1,8 +1,8 @@
 ---
 name: token-optimizer
-description: Enforces strict token-efficiency for all code generation, editing, and agentic tasks. Use this skill whenever the user wants to minimize token usage, reduce verbose output, work within tight context limits, or speed up responses. Also apply proactively for any code editing, generation, or multi-step agent task where token waste is a risk — even if the user doesn't explicitly ask for it.
+description: "DEFAULT: Apply to ALL coding tasks unless explicitly disabled. Enforces strict token-efficiency for code generation, editing, multi-step workflows, and agent tasks. Minimize verbose output, redundant explanations, and unnecessary documentation. Use by default for any coding work — edits, new files, refactoring, debugging, implementation, planning follow-through. Only skip if user explicitly says 'be verbose' or 'explain in detail'. This is your baseline operating mode for efficient, focused work."
 metadata:
-  version: "2.0.0"
+  version: "3.0.0"
   author: "Maxime Cottret (aolwas)"
 ---
 
@@ -42,3 +42,52 @@ In multi-step workflows, the per-step overhead compounds quickly. Keep each step
 ## The test: earn every token
 
 Before writing any output, ask: does each sentence, comment, or step earn its place? If removing it wouldn't affect correctness or the user's ability to act, remove it.
+
+## Avoid Redundant Output During Implementation
+
+During implementation phase (after planning/design):
+
+### Identify Redundant Documentation
+
+Before creating any document or section, ask:
+- Is this information already documented elsewhere (plan file, existing docs)?
+- Am I just reformatting the same content in a different format?
+- Would the user need to read multiple documents to get one answer?
+
+If YES to any of these: **Stop. Don't create it.**
+
+### Anti-Patterns
+
+- Creating 5 markdown files with overlapping content (e.g., "Implementation Report", "Changes Summary", "Quick Start", "README", "Technical Deep Dive")
+- "Summary of summary" documents
+- Defensive documentation "just in case user needs it"
+- Copying content from plan into implementation reports
+
+### Implementation Output Discipline
+
+**After implementation, output should be:**
+- One status line: "✅ Done: [what changed in 1 sentence]"
+- Brief list of files affected (if complex)
+- Reference to plan file for full context: "See .zed/plans/[filename].md"
+
+**NOT:**
+- Extensive narratives
+- Multiple format variations of the same info
+- Prophylactic user guides or checklists
+
+### Decision Framework
+
+```
+Need to document this?
+├─ User explicitly asked → YES: Document it
+├─ Already in plan file → NO: Don't duplicate
+├─ New information not covered elsewhere → YES: Create it
+└─ Just reformatting existing info → NO: Don't create it
+```
+
+### Token Impact
+
+- **Creating 5 redundant docs**: Wastes 1000+ tokens, adds context overhead
+- **Creating 1 focused status update + referencing plan**: 100-200 tokens, clean handoff
+
+Choose the latter.

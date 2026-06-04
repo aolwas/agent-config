@@ -2,11 +2,18 @@
 name: plan-mode
 description: Break down complex tasks into detailed, step-by-step plans before implementation. Analyze requirements, identify dependencies, propose solutions, and structure work for clarity and efficiency. Use this when tackling large features, refactoring, debugging, or multi-part changes.
 disable-model-invocation: true
+uses-skills:
+  - token-optimizer
+metadata:
+  version: "2.0.0"
+  author: "Maxime Cottret (aolwas)"
 ---
 
 # Plan Mode
 
 Use this skill to think through complex tasks methodically before jumping into code. This mirrors Claude's extended thinking or Copilot's planning capabilities.
+
+**Note**: This skill works in conjunction with the `token-optimizer` skill. Token-optimizer handles general efficiency (terse communication, minimal explanations, avoiding redundant documentation). Plan-mode adds planning-specific discipline on top.
 
 ## When to Use Plan Mode
 
@@ -174,54 +181,16 @@ Plans are automatically saved to `.zed/plans/` in the project root for easy refe
 4. **Update**: If requirements change, update the plan file and continue from there
 5. **Complete**: Plan remains available for the session for history and reference
 
-## Token Optimization During Implementation
+## Implementation After Planning
 
-Plans enable significant token savings during implementation by reducing context overhead:
+Once you have created the plan:
+1. **Confirm with the user**: Does this approach work for you?
+2. **Save the plan**: Plan is automatically saved to `.zed/plans/<session-id>.md`
+3. **Start implementation**: Execute each phase as a focused task, referencing the saved plan
+4. **Adjust as needed**: If requirements change during implementation, update the plan file
+5. **Validate**: Ensure each phase meets its success criteria before moving to the next
 
-### How Planning Reduces Tokens
-
-**Without a plan**:
-- Agent must re-analyze requirements for each step
-- Context window fills with task re-explanation
-- Redundant exploration of alternatives during implementation
-- Each implementation step includes reasoning from scratch
-
-**With a plan**:
-- Implementation phases are pre-scoped and sequenced
-- Agent references the saved plan instead of re-explaining
-- No need to revisit architectural decisions
-- Each step focuses on code, not planning
-
-### Using Plans for Token Efficiency
-
-**When implementing each phase**:
-1. **Read the plan file**: `.zed/plans/<session-id>.md` contains all context
-2. **Reference specific steps**: Implement Step X.Y from the plan
-3. **Delegate with the plan**: Pass the plan file path to delegated agents for context
-4. **Minimize re-explanation**: Continue from Phase N in `.zed/plans/<session-id>.md`
-5. **Use brief checkpoints**: Completed Phase N per plan. Ready for Phase N+1.
-
-### Token-Efficient Workflow Example
-
-**Initial planning** (full context, comprehensive reasoning):
-- User describes task
-- Agent uses plan-mode skill, creates detailed multi-phase plan
-- Result: Saves `.zed/plans/session-abc123.md`
-
-**Phase 1 implementation** (minimal re-context):
-- User: Implement Phase 1 from the plan
-- Agent: Reads plan file, implements only Phase 1 steps
-- Token saved: No re-explanation of overall architecture
-
-**Phase 2 continuation** (focused, plan-driven):
-- User: Next phase
-- Agent: References plan for Phase 2, builds on Phase 1
-- Token saved: No context re-building, no architectural re-discussion
-
-**Delegating work** (plan as context):
-- Agent: Delegates Phase 3 to another agent with plan file path
-- Delegated Agent: Reads plan, knows exact scope, no re-planning needed
-- Token saved: Delegation does not require re-explaining the full task
+**During implementation**: Follow the `token-optimizer` skill for efficient execution. Reference the saved plan file for context instead of re-explaining. Update the plan file only if implementation diverges from the original plan or new risks are discovered.
 
 ## Frugal Planning: High Reasoning, Low Tokens
 
@@ -368,14 +337,3 @@ Real-time + scalable. Trade-off: more complex than polling.
 - **Reasoning preserved**: Every key decision has rationale
 - **Re-planning needed**: Zero (plan is comprehensive)
 - **Total for multi-phase task**: 3-7K tokens (vs 10-20K without planning)
-
-## Implementation After Planning
-
-Once you have created the plan:
-1. **Confirm with the user**: Does this approach work for you?
-2. **Save the plan**: Plan is automatically saved to `.zed/plans/<session-id>.md`
-3. **Start implementation**: Execute each phase as a focused task, referencing the saved plan
-4. **Adjust as needed**: If requirements change during implementation, update the plan file
-5. **Validate**: Ensure each phase meets its success criteria before moving to the next
-
-The plan file acts as a living document throughout the session, allowing you and the agent to stay aligned on scope and approach while maintaining high reasoning quality and minimizing token overhead.
